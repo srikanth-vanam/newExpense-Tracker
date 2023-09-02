@@ -1,11 +1,14 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Card from "../UI/Card";
 import classes from "./SignUP.module.css";
 import { Button } from "react-bootstrap";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 const SignUp = () => {
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const confirmpswdInputRef = useRef();
+  const [isLogin, setIsLogin] = useState(false);
+  const history=useHistory();
   const submitHandler = (e) => {
     e.preventDefault();
     const userCredentials = {
@@ -16,17 +19,22 @@ const SignUp = () => {
   };
 
   const postUserData = (obj) => {
-    fetch(
-      "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyC6fdqT-BKSYvdgNjdso0biEIf45XQLPXk",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          email: obj.email,
-          password: obj.password,
-          returnSecureToken: true,
-        }),
-      }
-    )
+    let url;
+    if (isLogin) {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyC6fdqT-BKSYvdgNjdso0biEIf45XQLPXk";
+    } else {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyC6fdqT-BKSYvdgNjdso0biEIf45XQLPXk";
+    }
+    fetch(url, {
+      method: "POST",
+      body: JSON.stringify({
+        email: obj.email,
+        password: obj.password,
+        returnSecureToken: true,
+      }),
+    })
       .then((res) => {
         if (!res.ok) {
           throw new Error("error in posting data");
@@ -35,17 +43,19 @@ const SignUp = () => {
         }
       })
       .then((data) => {
-        console.log(data);
+        localStorage.setItem(obj.email,data.idToken);
+        console.log(data.idToken);
       })
       .catch((err) => {
         alert(err.message);
       });
+    history.replace('/home');
   };
 
   return (
     <>
       <Card className="mb-0">
-        <h2>Sign Up</h2>
+        <h2>{isLogin ? "Login" : "Sign Up"}</h2>
         <form className={classes.form} onSubmit={submitHandler}>
           <label htmlFor="email" required>
             Email
@@ -53,14 +63,29 @@ const SignUp = () => {
           <input type="email" ref={emailInputRef}></input>
           <label htmlFor="password">Password</label>
           <input type="password" ref={passwordInputRef} required />
-          <label htmlFor="">Confirm Password</label>
-          <input type="pawwsord" ref={confirmpswdInputRef} required />
+          {!isLogin ? (
+            <>
+              <label htmlFor="">Confirm Password</label>
+              <input type="pawwsord" ref={confirmpswdInputRef} required />
+            </>
+          ) : (
+            ""
+          )}
           <Button className="d-block m-auto" type="submit" size="sm">
-            Sign Up
+            {isLogin ? "Login" : "Sign Up"}
           </Button>
         </form>
-        <Button className=" d-block m-auto mt-2" type="button" variant="secondary">
-          Have an account? Login
+        <Button
+          className=" d-block m-auto mt-2"
+          type="button"
+          variant="secondary"
+          onClick={() => setIsLogin((prev) => !prev)}
+        >
+          <p>
+            {isLogin
+              ? "Don't have an account? SignUP"
+              : "Already have an account?Login"}
+          </p>
         </Button>
       </Card>
     </>
