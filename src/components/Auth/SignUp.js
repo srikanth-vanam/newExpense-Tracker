@@ -43,7 +43,7 @@ const SignUp = () => {
         }
       })
       .then((data) => {
-        localStorage.setItem(obj.email,data.idToken);
+        localStorage.setItem("1",data.idToken);
         console.log(data.idToken);
       })
       .catch((err) => {

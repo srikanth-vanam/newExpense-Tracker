@@ -1,0 +1,11 @@
+.outer{
+    height: 5rem;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid black;
+}
+.btn{
+    border: none;
+}
