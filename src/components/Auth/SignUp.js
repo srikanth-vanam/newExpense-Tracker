@@ -52,6 +52,10 @@ const SignUp = () => {
     history.replace('/home');
   };
 
+  const forgotHandler=()=>{
+    history.push("/forgotPassword");
+  }
+
   return (
     <>
       <Card className="mb-0">
@@ -71,9 +75,12 @@ const SignUp = () => {
           ) : (
             ""
           )}
-          <Button className="d-block m-auto" type="submit" size="sm">
+          <div className="d-flex">
+          <Button className=" m-auto" type="submit" size="sm">
             {isLogin ? "Login" : "Sign Up"}
           </Button>
+          <Button  variant="" className="text-danger" onClick={forgotHandler}>Forgot Password?</Button>
+          </div>
         </form>
         <Button
           className=" d-block m-auto mt-2"
