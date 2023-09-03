@@ -1,6 +1,6 @@
 import { Button, Card, Form, FormControl, FormLabel } from "react-bootstrap";
 import classes from "./Profile.module.css";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 const Profile = () => {
   const fullnameInputRef = useRef();
   const urlInputRef = useRef();
@@ -10,9 +10,46 @@ const Profile = () => {
       displayName: fullnameInputRef.current.value,
       photoUrl: urlInputRef.current.value,
     };
-    fullnameInputRef.current.value="";
-    urlInputRef.current.value="";
+    fullnameInputRef.current.value = "";
+    urlInputRef.current.value = "";
     updateDataHandler(obj);
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("1");
+    if (token) {
+      getUsersDataHandler(token);
+    }
+  }, []);
+
+  const getUsersDataHandler = (token) => {
+    fetch(
+      "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyC6fdqT-BKSYvdgNjdso0biEIf45XQLPXk",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          idToken: token,
+        }),
+      }
+    )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("error in getting Users data");
+        } else {
+          return res.json();
+        }
+      })
+      .then((data) => {
+        console.log(data);
+        console.log(data.users[0]);
+        if(data && data.users[0].displayName!== undefined){
+          fullnameInputRef.current.value = data.users[0].displayName;
+          urlInputRef.current.value = data.users[0].photoUrl;
+        }
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
   };
 
   const updateDataHandler = (obj) => {
