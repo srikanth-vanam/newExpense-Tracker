@@ -1,6 +1,7 @@
 import { useHistory } from "react-router-dom/cjs/react-router-dom";
 import classes from "./Home.module.css";
 import { Button } from "react-bootstrap";
+import ExpenseForm from "../Expense/ExpenseForm";
 const Home = () => {
   const history = useHistory();
 
@@ -60,6 +61,7 @@ const Home = () => {
           Logout
         </Button>
       </div>
+      <ExpenseForm />
     </>
   );
 };
