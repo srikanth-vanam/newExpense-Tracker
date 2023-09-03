@@ -4,43 +4,61 @@ import { Button } from "react-bootstrap";
 const Home = () => {
   const history = useHistory();
 
-  const emailVerifyHandler=()=>{
+  const emailVerifyHandler = () => {
     const token = localStorage.getItem("1");
-    fetch("https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyC6fdqT-BKSYvdgNjdso0biEIf45XQLPXk",{
-      method: "POST",
-      body: JSON.stringify({
-        requestType:"VERIFY_EMAIL",
-        idToken: token,
-      }),
-    })
-    .then((res)=>{
-      if(!res.ok){
-        throw new Error("error in email verify handler");
-      } else {
-        return res.json();
+    fetch(
+      "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyC6fdqT-BKSYvdgNjdso0biEIf45XQLPXk",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          requestType: "VERIFY_EMAIL",
+          idToken: token,
+        }),
       }
-    })
-    .then((data) => {
-      console.log("verify email ",data);
-      alert("please check your mail to proceed further.!!")
-    })
-    .catch((err) => {
-      alert(err.message);
-    });
-  }
+    )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("error in email verify handler");
+        } else {
+          return res.json();
+        }
+      })
+      .then((data) => {
+        console.log("verify email ", data);
+        alert("please check your mail to proceed further.!!");
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
+  };
+
+  const logoutHandler = () => {
+    localStorage.removeItem("1");
+    console.log("removed token");
+    history.replace("/");
+  };
 
   return (
     <>
       <div className={classes.outer}>
         <p>Welcome Home</p>
-        <Button variant="secondary" onClick={emailVerifyHandler}>Verify Email</Button >
+        <Button variant="secondary" onClick={emailVerifyHandler}>
+          Verify Email
+        </Button>
         <p>
           {" "}
           Your profile is Incomplete{" "}
-          <button type="button" className={classes.btn} onClick={() => history.push("/profile")}>
+          <button
+            type="button"
+            className={classes.btn}
+            onClick={() => history.push("/profile")}
+          >
             Complete now
           </button>
         </p>
+        <Button variant="danger" onClick={logoutHandler}>
+          Logout
+        </Button>
       </div>
     </>
   );
