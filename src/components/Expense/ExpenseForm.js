@@ -16,65 +16,166 @@ const ExpenseForm = () => {
   const desciptionInputRef = useRef();
   const categoryInputRef = useRef();
 
+  const [isUpdate, setIsUpdate] = useState(false); // a boolean value that facilitates the updation.
+  const [updateId, setUpdateId] = useState(null); // contains id of the object, that user wants to edit/update.
+  const isUpdateHandler = () => {
+    setIsUpdate(true);
+  };
+
   const submitHandler = (e) => {
     e.preventDefault();
     const formData = {
-      id: Math.random().toString(),
       price: priceInputRef.current.value,
       description: desciptionInputRef.current.value,
       category: categoryInputRef.current.value,
     };
 
-    fetch("https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses.json",{
-      method:'POST',
-      body:JSON.stringify(formData),
-    })
-    .then((res)=>{
-      if(!res.ok){
-        throw new Error("cannot post data to database");
+    priceInputRef.current.value = "";
+    desciptionInputRef.current.value = "";
+    categoryInputRef.current.value = "Travel";
+
+    fetch(
+      "https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses.json",
+      {
+        method: "POST",
+        body: JSON.stringify(formData),
       }
-      else{
-        return res.json();
-      }
-    })
-    .then((data)=>{
-      getHandler();
-      console.log(data);
-    })
-    .catch((err)=>{
-      alert(err.message);
-    })
+    )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("cannot post/update data to database");
+        } else {
+          return res.json();
+        }
+      })
+      .then((data) => {
+        getHandler();
+        console.log(data);
+        setUpdateId(null);
+        setIsUpdate(false);
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     getHandler();
-  },[])
+  }, []);
 
-  const getHandler=()=>{
-    fetch("https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses.json",{
-      method:'GET',
-    })
-    .then((res)=>{
-      if(!res.ok){
-        throw new Error("cannot post data to database");
+  const getHandler = () => {
+    fetch(
+      "https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses.json",
+      {
+        method: "GET",
       }
-      else{
-        return res.json();
+    )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("cannot post data to database");
+        } else {
+          return res.json();
+        }
+      })
+      .then((data) => {
+        console.log("inside get handler", data);
+        const itemsArray = [];
+        for (const key in data) {
+          // console.log(data[key]);
+          data[key].id = key;
+          // console.log("key id is ",data[key].id);
+          itemsArray.push(data[key]);
+        }
+        setExpenseItems(itemsArray);
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
+  };
+
+  const deleteHandler = (id) => {
+    fetch(
+      `https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses/${id}.json`,
+      {
+        method: "DELETE",
       }
-    })
-    .then((data)=>{
-      console.log("inside get handler",data);
-      const itemsArray=[];
-      for (const key in data) {
-        // console.log(data[key]);
-        itemsArray.push(data[key]);
+    )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("cannot delete data from database");
+        } else {
+          return res.json();
+        }
+      })
+      .then((data) => {
+        console.log("inside delete handler", data);
+        // after deleting calling gethandler to change the display
+        getHandler();
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
+  };
+
+  const editHandler = (id) => {
+    // gets data of particular 'id' object only
+    fetch(
+      `https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses/${id}.json`,
+      {
+        method: "GET",
       }
-      setExpenseItems(itemsArray);
-    })
-    .catch((err)=>{
-      alert(err.message);
-    })
-  }
+    )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("cannot post data to database");
+        } else {
+          return res.json();
+        }
+      })
+      .then((data) => {
+        // console.log("inside edit-handler", data);
+        priceInputRef.current.value = data.price;
+        desciptionInputRef.current.value = data.description;
+        categoryInputRef.current.value = data.category;
+        setUpdateId(id); // sets the id, which this function is getting from user clicked expense item.
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
+  };
+
+  const updateExpenseHandler = () => {
+    fetch(
+      `https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses/${updateId}.json`,
+      {
+        method: "PUT",
+        body: JSON.stringify({
+          price: priceInputRef.current.value,
+          description: desciptionInputRef.current.value,
+          category: categoryInputRef.current.value,
+        }),
+      }
+    )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("cannot update data to database");
+        } else {
+          return res.json();
+        }
+      })
+      .then((data) => {
+        getHandler(); // calling getHandler
+        // console.log(data);
+        setUpdateId(null); // sets id to null
+        setIsUpdate(false); // isUpdate is set to false
+        priceInputRef.current.value = "";
+        desciptionInputRef.current.value = "";
+        categoryInputRef.current.value = "Travel";
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
+  };
 
   return (
     <>
@@ -115,12 +216,31 @@ const ExpenseForm = () => {
               <option>Furniture</option>
             </FormSelect>
           </div>
-          <Button className="m-2 " type="submit">
-            Add Expense
-          </Button>
+          {isUpdate ? (
+            <Button
+              className="m-2 "
+              type="button"
+              onClick={updateExpenseHandler}
+            >
+              Update Expense
+            </Button>
+          ) : (
+            <Button className="m-2 " type="submit">
+              Add Expense
+            </Button>
+          )}
         </Form>
       </Card>
-      {expenseItems.length !== 0 ? <ExpenseItems items={expenseItems} /> : ""}
+      {expenseItems.length !== 0 ? (
+        <ExpenseItems
+          items={expenseItems}
+          onEdit={editHandler}
+          onDelete={deleteHandler}
+          onUpdate={isUpdateHandler} // sets isUpdate to true
+        />
+      ) : (
+        ""
+      )}
     </>
   );
 };

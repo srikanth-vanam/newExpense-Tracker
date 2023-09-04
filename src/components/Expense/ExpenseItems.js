@@ -1,9 +1,13 @@
-import { Card, Table } from "react-bootstrap";
+import { Button, Card, Table } from "react-bootstrap";
 
 const ExpenseItems = (props) => {
+  const clickHandler=(id)=>{
+    props.onEdit(id);
+    props.onUpdate();
+  }
   return (
     <>
-      <Card className="m-auto mt-3 p-1 w-50">
+      <Card className="m-auto mt-3 p-1 w-75">
         <Card.Title className="text-center mt-1">Your Expense Items</Card.Title>
         <Card.Body>
           <Table className="text-center" striped>
@@ -13,6 +17,8 @@ const ExpenseItems = (props) => {
                 <th>Price</th>
                 <th>Description</th>
                 <th>Category</th>
+                <th>Action 1</th>
+                <th>Action 2</th>
               </tr>
               {props.items.map((item, index) => (
                 <tr className="m-1 " key={item.id}>
@@ -20,6 +26,8 @@ const ExpenseItems = (props) => {
                   <td>{item.price}</td>
                   <td>{item.description}</td>
                   <td>{item.category}</td>
+                  <td><Button variant="secondary" onClick={()=>clickHandler(item.id)}>Edit</Button></td>
+                  <td><Button variant="danger" onClick={()=>props.onDelete(item.id)}>Delete</Button></td>
                 </tr>
               ))}
             </tbody>
