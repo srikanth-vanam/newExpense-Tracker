@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Button,
   Card,
@@ -24,11 +24,57 @@ const ExpenseForm = () => {
       description: desciptionInputRef.current.value,
       category: categoryInputRef.current.value,
     };
-    setExpenseItems((prevExpense) => {
-      console.log("inside the handler");
-      return [...prevExpense, formData];
-    });
+
+    fetch("https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses.json",{
+      method:'POST',
+      body:JSON.stringify(formData),
+    })
+    .then((res)=>{
+      if(!res.ok){
+        throw new Error("cannot post data to database");
+      }
+      else{
+        return res.json();
+      }
+    })
+    .then((data)=>{
+      getHandler();
+      console.log(data);
+    })
+    .catch((err)=>{
+      alert(err.message);
+    })
   };
+
+  useEffect(()=>{
+    getHandler();
+  },[])
+
+  const getHandler=()=>{
+    fetch("https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses.json",{
+      method:'GET',
+    })
+    .then((res)=>{
+      if(!res.ok){
+        throw new Error("cannot post data to database");
+      }
+      else{
+        return res.json();
+      }
+    })
+    .then((data)=>{
+      console.log("inside get handler",data);
+      const itemsArray=[];
+      for (const key in data) {
+        // console.log(data[key]);
+        itemsArray.push(data[key]);
+      }
+      setExpenseItems(itemsArray);
+    })
+    .catch((err)=>{
+      alert(err.message);
+    })
+  }
 
   return (
     <>
@@ -64,6 +110,9 @@ const ExpenseForm = () => {
               <option>Food</option>
               <option>Shopping</option>
               <option>Fuel</option>
+              <option>Medical</option>
+              <option>Kitchen Utilities</option>
+              <option>Furniture</option>
             </FormSelect>
           </div>
           <Button className="m-2 " type="submit">
