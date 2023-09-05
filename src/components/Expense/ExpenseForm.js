@@ -8,18 +8,17 @@ import {
   FormSelect,
 } from "react-bootstrap";
 import ExpenseItems from "./ExpenseItems";
+import { useDispatch, useSelector } from "react-redux";
+import { expenseActions } from "../../store/store";
 
 const ExpenseForm = () => {
-  const [expenseItems, setExpenseItems] = useState([]);
 
   const priceInputRef = useRef();
   const desciptionInputRef = useRef();
   const categoryInputRef = useRef();
 
-  const [isUpdate, setIsUpdate] = useState(false); // a boolean value that facilitates the updation.
-  const [updateId, setUpdateId] = useState(null); // contains id of the object, that user wants to edit/update.
   const isUpdateHandler = () => {
-    setIsUpdate(true);
+    dispatch(expenseActions.setUpdateBool(true));
   };
 
   const submitHandler = (e) => {
@@ -51,13 +50,18 @@ const ExpenseForm = () => {
       .then((data) => {
         getHandler();
         console.log(data);
-        setUpdateId(null);
-        setIsUpdate(false);
+        dispatch(expenseActions.setEditId(null));
+        dispatch(expenseActions.setUpdateBool(false));
       })
       .catch((err) => {
         alert(err.message);
       });
   };
+
+  const expenseItems=useSelector(state=>state.expense.expenseItems);
+  const isUpdate=useSelector(state=>state.expense.isUpdateBool);
+  const editId=useSelector(state=>state.expense.editId);
+  const dispatch=useDispatch();
 
   useEffect(() => {
     getHandler();
@@ -80,13 +84,19 @@ const ExpenseForm = () => {
       .then((data) => {
         console.log("inside get handler", data);
         const itemsArray = [];
+        let amount=0;
         for (const key in data) {
           // console.log(data[key]);
           data[key].id = key;
+          amount+=Number.parseInt(data[key].price);
+          if(amount>=10000){
+            console.log("amount is ",amount);
+            dispatch(expenseActions.setPremium());
+          }
           // console.log("key id is ",data[key].id);
           itemsArray.push(data[key]);
         }
-        setExpenseItems(itemsArray);
+        dispatch(expenseActions.setExpenseItems(itemsArray));
       })
       .catch((err) => {
         alert(err.message);
@@ -137,7 +147,8 @@ const ExpenseForm = () => {
         priceInputRef.current.value = data.price;
         desciptionInputRef.current.value = data.description;
         categoryInputRef.current.value = data.category;
-        setUpdateId(id); // sets the id, which this function is getting from user clicked expense item.
+        // seteditId(id); // sets the id, which this function is getting from user clicked expense item.
+        dispatch(expenseActions.setEditId(id));
       })
       .catch((err) => {
         alert(err.message);
@@ -146,7 +157,7 @@ const ExpenseForm = () => {
 
   const updateExpenseHandler = () => {
     fetch(
-      `https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses/${updateId}.json`,
+      `https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses/${editId}.json`,
       {
         method: "PUT",
         body: JSON.stringify({
@@ -165,9 +176,11 @@ const ExpenseForm = () => {
       })
       .then((data) => {
         getHandler(); // calling getHandler
-        // console.log(data);
-        setUpdateId(null); // sets id to null
-        setIsUpdate(false); // isUpdate is set to false
+        console.log("in updateExp handler",data);
+        dispatch(expenseActions.setEditId(null));
+        dispatch(expenseActions.setUpdateBool(false));
+        // setUpdateId(null); // sets id to null
+        // setIsUpdate(false); // isUpdate is set to false
         priceInputRef.current.value = "";
         desciptionInputRef.current.value = "";
         categoryInputRef.current.value = "Travel";

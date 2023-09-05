@@ -2,11 +2,16 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom";
 import classes from "./Home.module.css";
 import { Button } from "react-bootstrap";
 import ExpenseForm from "../Expense/ExpenseForm";
+import { useDispatch, useSelector } from "react-redux";
+import { Authactions } from "../../store/store";
+
 const Home = () => {
   const history = useHistory();
+  const token = useSelector((state) => state.auth.token);
+  const isPremium = useSelector((state) => state.expense.isPremium);
+  const dispatch = useDispatch();
 
   const emailVerifyHandler = () => {
-    const token = localStorage.getItem("1");
     fetch(
       "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyC6fdqT-BKSYvdgNjdso0biEIf45XQLPXk",
       {
@@ -34,7 +39,7 @@ const Home = () => {
   };
 
   const logoutHandler = () => {
-    localStorage.removeItem("1");
+    dispatch(Authactions.removeToken());
     console.log("removed token");
     history.replace("/");
   };
@@ -61,6 +66,15 @@ const Home = () => {
           Logout
         </Button>
       </div>
+      {isPremium && (
+        <Button
+          variant="secondary"
+          className=" d-block m-auto mt-3"
+          type="button"
+        >
+          Activate Premium
+        </Button>
+      )}
       <ExpenseForm />
     </>
   );

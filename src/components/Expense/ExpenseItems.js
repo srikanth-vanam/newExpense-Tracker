@@ -1,10 +1,20 @@
 import { Button, Card, Table } from "react-bootstrap";
+// import { useDispatch } from "react-redux";
+// import { expenseActions } from "../../store/store";
 
 const ExpenseItems = (props) => {
+  // const dispatch=useDispatch();
   const clickHandler=(id)=>{
+    // dispatch(expenseActions.setEditId(id));
     props.onEdit(id);
     props.onUpdate();
   }
+
+  const deleteHandler=(id)=>{
+    // dispatch(expenseActions.setDeleteId(id))
+    props.onDelete(id);
+  }
+
   return (
     <>
       <Card className="m-auto mt-3 p-1 w-75">
@@ -27,7 +37,7 @@ const ExpenseItems = (props) => {
                   <td>{item.description}</td>
                   <td>{item.category}</td>
                   <td><Button variant="secondary" onClick={()=>clickHandler(item.id)}>Edit</Button></td>
-                  <td><Button variant="danger" onClick={()=>props.onDelete(item.id)}>Delete</Button></td>
+                  <td><Button variant="danger" onClick={()=>deleteHandler(item.id)}>Delete</Button></td>
                 </tr>
               ))}
             </tbody>

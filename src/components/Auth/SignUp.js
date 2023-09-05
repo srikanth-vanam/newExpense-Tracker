@@ -3,11 +3,14 @@ import Card from "../UI/Card";
 import classes from "./SignUP.module.css";
 import { Button } from "react-bootstrap";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { useDispatch, useSelector } from "react-redux";
+import { Authactions } from "../../store/store";
+
 const SignUp = () => {
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const confirmpswdInputRef = useRef();
-  const [isLogin, setIsLogin] = useState(false);
+  // const [isLogin, setIsLogin] = useState(false);
   const history=useHistory();
   const submitHandler = (e) => {
     e.preventDefault();
@@ -17,6 +20,9 @@ const SignUp = () => {
     };
     postUserData(userCredentials);
   };
+
+  const isLogin=useSelector(state=>state.auth.isLogin);
+  const dispatch=useDispatch();
 
   const postUserData = (obj) => {
     let url;
@@ -44,6 +50,8 @@ const SignUp = () => {
       })
       .then((data) => {
         localStorage.setItem("1",data.idToken);
+        dispatch(Authactions.setToken(data.idToken));
+        console.log("added token to store");
         console.log(data.idToken);
       })
       .catch((err) => {
@@ -54,6 +62,10 @@ const SignUp = () => {
 
   const forgotHandler=()=>{
     history.push("/forgotPassword");
+  }
+
+  const loginHandler=()=>{
+    dispatch(Authactions.loginHandler());
   }
 
   return (
@@ -86,7 +98,7 @@ const SignUp = () => {
           className=" d-block m-auto mt-2"
           type="button"
           variant="secondary"
-          onClick={() => setIsLogin((prev) => !prev)}
+          onClick={loginHandler}
         >
           <p>
             {isLogin
