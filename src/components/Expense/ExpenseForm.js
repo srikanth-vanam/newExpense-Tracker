@@ -9,7 +9,7 @@ import {
 } from "react-bootstrap";
 import ExpenseItems from "./ExpenseItems";
 import { useDispatch, useSelector } from "react-redux";
-import { expenseActions } from "../../store/store";
+import { expenseActions, themeActions } from "../../store/store";
 
 const ExpenseForm = () => {
 
@@ -91,7 +91,11 @@ const ExpenseForm = () => {
           amount+=Number.parseInt(data[key].price);
           if(amount>=10000){
             console.log("amount is ",amount);
-            dispatch(expenseActions.setPremium());
+            dispatch(expenseActions.setPremium(true));
+          }
+          else{
+            dispatch(expenseActions.setPremium(false));
+            dispatch(themeActions.deactivateTheme());
           }
           // console.log("key id is ",data[key].id);
           itemsArray.push(data[key]);

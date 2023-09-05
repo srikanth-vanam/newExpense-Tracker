@@ -3,14 +3,21 @@ import classes from "./Home.module.css";
 import { Button } from "react-bootstrap";
 import ExpenseForm from "../Expense/ExpenseForm";
 import { useDispatch, useSelector } from "react-redux";
-import { Authactions } from "../../store/store";
+import { Authactions, themeActions } from "../../store/store";
 
 const Home = () => {
   const history = useHistory();
   const token = useSelector((state) => state.auth.token);
   const isPremium = useSelector((state) => state.expense.isPremium);
   const dispatch = useDispatch();
-
+  const isActivateTheme = useSelector((state) => state.theme.isActivateTheme);
+  const isDark = useSelector((state) => state.theme.isDark);
+  const themeToggler = () => {
+    dispatch(themeActions.themeToggler());
+  };
+  const premiumHandler = () => {
+    dispatch(themeActions.activateTheme());
+  };
   const emailVerifyHandler = () => {
     fetch(
       "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyC6fdqT-BKSYvdgNjdso0biEIf45XQLPXk",
@@ -45,8 +52,8 @@ const Home = () => {
   };
 
   return (
-    <>
-      <div className={classes.outer}>
+    <div className={`${isDark?classes.bodyDark:classes.bodyLight}`}>
+      <div className={`${classes.outer} ${isDark?classes.dark:''}`}>
         <p>Welcome Home</p>
         <Button variant="secondary" onClick={emailVerifyHandler}>
           Verify Email
@@ -62,21 +69,36 @@ const Home = () => {
             Complete now
           </button>
         </p>
+        {isActivateTheme && (
+          <Button onClick={themeToggler}>
+            {isDark ? "Light theme" : "Dark theme"}
+          </Button>
+        )}
         <Button variant="danger" onClick={logoutHandler}>
           Logout
         </Button>
       </div>
       {isPremium && (
-        <Button
-          variant="secondary"
-          className=" d-block m-auto mt-3"
-          type="button"
-        >
-          Activate Premium
-        </Button>
+        <div className="d-flex justify-content-center align-items-center">
+          <Button
+            variant="secondary"
+            className="m-3"
+            type="button"
+            onClick={premiumHandler}
+          >
+            Activate Premium
+          </Button>
+          <Button
+            variant="secondary"
+            className="m-3"
+            type="button"
+          >
+            Download Expenses
+          </Button>
+        </div>
       )}
       <ExpenseForm />
-    </>
+    </div>
   );
 };
 
