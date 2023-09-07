@@ -20,7 +20,7 @@ const ExpenseForm = () => {
   const isUpdateHandler = () => {
     dispatch(expenseActions.setUpdateBool(true));
   };
-
+  const email=useSelector(state=>state.auth.emailId);
   const submitHandler = (e) => {
     e.preventDefault();
     const formData = {
@@ -34,7 +34,7 @@ const ExpenseForm = () => {
     categoryInputRef.current.value = "Travel";
 
     fetch(
-      "https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses.json",
+      `https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses/${email}.json`,
       {
         method: "POST",
         body: JSON.stringify(formData),
@@ -69,7 +69,7 @@ const ExpenseForm = () => {
 
   const getHandler = () => {
     fetch(
-      "https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses.json",
+      `https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses/${email}.json`,
       {
         method: "GET",
       }
@@ -109,7 +109,7 @@ const ExpenseForm = () => {
 
   const deleteHandler = (id) => {
     fetch(
-      `https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses/${id}.json`,
+      `https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses/${email}/${id}.json`,
       {
         method: "DELETE",
       }
@@ -134,7 +134,7 @@ const ExpenseForm = () => {
   const editHandler = (id) => {
     // gets data of particular 'id' object only
     fetch(
-      `https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses/${id}.json`,
+      `https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses/${email}/${id}.json`,
       {
         method: "GET",
       }
@@ -161,7 +161,7 @@ const ExpenseForm = () => {
 
   const updateExpenseHandler = () => {
     fetch(
-      `https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses/${editId}.json`,
+      `https://expense-tracker-fea86-default-rtdb.firebaseio.com/expenses/${email}/${editId}.json`,
       {
         method: "PUT",
         body: JSON.stringify({

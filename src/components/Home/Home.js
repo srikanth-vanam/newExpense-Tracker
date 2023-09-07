@@ -4,6 +4,7 @@ import { Button } from "react-bootstrap";
 import ExpenseForm from "../Expense/ExpenseForm";
 import { useDispatch, useSelector } from "react-redux";
 import { Authactions, themeActions } from "../../store/store";
+import { useEffect } from "react";
 
 const Home = () => {
   const history = useHistory();
@@ -13,6 +14,13 @@ const Home = () => {
   const isActivateTheme = useSelector((state) => state.theme.isActivateTheme);
   const isDark = useSelector((state) => state.theme.isDark);
   const expenseItems = useSelector((state) => state.expense.expenseItems);
+  // need to work on losing token,email on page-refresh
+  const email=useSelector(state=>state.auth.emailId);
+  useEffect(()=>{
+    dispatch(Authactions.setToken(token));
+    dispatch(Authactions.setEmailId(email));
+    console.log("in homes useEffect",email);
+  },[])
 
   const themeToggler = () => {
     dispatch(themeActions.themeToggler());
@@ -49,6 +57,7 @@ const Home = () => {
 
   const logoutHandler = () => {
     dispatch(Authactions.removeToken());
+    // dispatch(Authactions.setEmailId(null));
     console.log("removed token");
     history.replace("/");
   };

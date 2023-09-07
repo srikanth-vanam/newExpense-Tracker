@@ -1,7 +1,8 @@
 import { Button, Card, Form, FormControl, FormLabel } from "react-bootstrap";
 import classes from "./Profile.module.css";
 import { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { Authactions } from "../../../store/store";
 const Profile = () => {
   const fullnameInputRef = useRef();
   const urlInputRef = useRef();
@@ -17,13 +18,13 @@ const Profile = () => {
   };
 
   const token=useSelector(state=>state.auth.token);
-
-  // useEffect(() => {
-  //   // const token = localStorage.getItem("1");
-  //   if (token!==null) {
-  //     getUsersDataHandler(token);
-  //   }
-  // }, []);
+  console.log(token);
+  useEffect(() => {
+    // const token = localStorage.getItem("1");
+    if (token!==null) {
+      getUsersDataHandler(token);
+    }
+  }, []);
 
   const getUsersDataHandler = (token) => {
     fetch(
@@ -77,7 +78,7 @@ const Profile = () => {
       })
       .then((data) => {
         console.log(data);
-        getUsersDataHandler(token);
+        // getUsersDataHandler(token);
       })
       .catch((err) => {
         alert(err.message);

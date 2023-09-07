@@ -1,6 +1,6 @@
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 
-const initialAuthState = { token: null, id: null, isLogin: false };
+const initialAuthState = { token: null, emailId: null, isLogin: false };
 const authSlice = createSlice({
   name: "authentication",
   initialState: initialAuthState,
@@ -13,6 +13,9 @@ const authSlice = createSlice({
     },
     removeToken(state) {
       state.token = null;
+    },
+    setEmailId(state,action){
+      state.emailId=action.payload;
     },
   },
 });

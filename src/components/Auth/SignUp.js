@@ -51,6 +51,9 @@ const SignUp = () => {
       .then((data) => {
         localStorage.setItem("1",data.idToken);
         dispatch(Authactions.setToken(data.idToken));
+        // splitting email and removing '.com' from it
+        const email=obj.email.split(".com")[0];
+        dispatch(Authactions.setEmailId(email));
         console.log("added token to store");
         console.log(data.idToken);
       })
@@ -81,7 +84,7 @@ const SignUp = () => {
           <input type="password" ref={passwordInputRef} required />
           {!isLogin ? (
             <>
-              <label htmlFor="">Confirm Password</label>
+              <label htmlFor="confirm">Confirm Password</label>
               <input type="pawwsord" ref={confirmpswdInputRef} required />
             </>
           ) : (
