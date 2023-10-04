@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import {
   Button,
   Card,
@@ -12,7 +12,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { expenseActions, themeActions } from "../../store/store";
 
 const ExpenseForm = () => {
-
   const priceInputRef = useRef();
   const desciptionInputRef = useRef();
   const categoryInputRef = useRef();
@@ -20,7 +19,7 @@ const ExpenseForm = () => {
   const isUpdateHandler = () => {
     dispatch(expenseActions.setUpdateBool(true));
   };
-  const email=useSelector(state=>state.auth.emailId);
+  const email = useSelector((state) => state.auth.emailId);
   const submitHandler = (e) => {
     e.preventDefault();
     const formData = {
@@ -58,14 +57,15 @@ const ExpenseForm = () => {
       });
   };
 
-  const expenseItems=useSelector(state=>state.expense.expenseItems);
-  const isUpdate=useSelector(state=>state.expense.isUpdateBool);
-  const editId=useSelector(state=>state.expense.editId);
-  const dispatch=useDispatch();
+  const expenseItems = useSelector((state) => state.expense.expenseItems);
+  const isUpdate = useSelector((state) => state.expense.isUpdateBool);
+  const editId = useSelector((state) => state.expense.editId);
+  const dispatch = useDispatch();
+  const isDark = useSelector((state) => state.theme.isDark);
 
   useEffect(() => {
     getHandler();
-  }, []);
+  }, [email]);
 
   const getHandler = () => {
     fetch(
@@ -84,23 +84,31 @@ const ExpenseForm = () => {
       .then((data) => {
         console.log("inside get handler", data);
         const itemsArray = [];
-        let amount=0;
-        for (const key in data) {
-          // console.log(data[key]);
-          data[key].id = key;
-          amount+=Number.parseInt(data[key].price);
-          if(amount>=10000){
-            console.log("amount is ",amount);
-            dispatch(expenseActions.setPremium(true));
+        if (data) {
+          let amount = 0;
+          for (const key in data) {
+            // console.log(data[key]);
+            data[key].id = key;
+            amount += Number.parseInt(data[key].price);
+            if (amount >= 10000) {
+              console.log("amount is ", amount);
+              if (isDark === true) {
+                dispatch(themeActions.activateTheme());
+              }
+              dispatch(expenseActions.setPremium(true));
+            } else {
+              dispatch(expenseActions.setPremium(false));
+              dispatch(themeActions.deactivateTheme());
+            }
+            // console.log("key id is ",data[key].id);
+            itemsArray.push(data[key]);
           }
-          else{
-            dispatch(expenseActions.setPremium(false));
-            dispatch(themeActions.deactivateTheme());
-          }
-          // console.log("key id is ",data[key].id);
-          itemsArray.push(data[key]);
+          dispatch(expenseActions.setExpenseItems(itemsArray));
+        } else {
+          dispatch(expenseActions.setExpenseItems(itemsArray));
+          dispatch(expenseActions.setPremium(false));
+          dispatch(themeActions.deactivateTheme());
         }
-        dispatch(expenseActions.setExpenseItems(itemsArray));
       })
       .catch((err) => {
         alert(err.message);
@@ -141,18 +149,23 @@ const ExpenseForm = () => {
     )
       .then((res) => {
         if (!res.ok) {
-          throw new Error("cannot post data to database");
+          throw new Error("error in getting data from database");
         } else {
           return res.json();
         }
       })
       .then((data) => {
-        // console.log("inside edit-handler", data);
-        priceInputRef.current.value = data.price;
-        desciptionInputRef.current.value = data.description;
-        categoryInputRef.current.value = data.category;
-        // seteditId(id); // sets the id, which this function is getting from user clicked expense item.
-        dispatch(expenseActions.setEditId(id));
+        console.log("inside edit-handler", data);
+        if (data) {
+          isUpdateHandler();
+          priceInputRef.current.value = data.price;
+          desciptionInputRef.current.value = data.description;
+          categoryInputRef.current.value = data.category;
+          // seteditId(id); // sets the id, which this function is getting from user clicked expense item.
+          dispatch(expenseActions.setEditId(id));
+        } else {
+          throw new Error("there is no data");
+        }
       })
       .catch((err) => {
         alert(err.message);
@@ -180,7 +193,7 @@ const ExpenseForm = () => {
       })
       .then((data) => {
         getHandler(); // calling getHandler
-        console.log("in updateExp handler",data);
+        console.log("in updateExp handler", data);
         dispatch(expenseActions.setEditId(null));
         dispatch(expenseActions.setUpdateBool(false));
         // setUpdateId(null); // sets id to null
@@ -253,7 +266,6 @@ const ExpenseForm = () => {
           items={expenseItems}
           onEdit={editHandler}
           onDelete={deleteHandler}
-          onUpdate={isUpdateHandler} // sets isUpdate to true
         />
       ) : (
         ""

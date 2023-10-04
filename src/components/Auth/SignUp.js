@@ -10,8 +10,7 @@ const SignUp = () => {
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const confirmpswdInputRef = useRef();
-  // const [isLogin, setIsLogin] = useState(false);
-  const history=useHistory();
+  const history = useHistory();
   const submitHandler = (e) => {
     e.preventDefault();
     const userCredentials = {
@@ -21,8 +20,8 @@ const SignUp = () => {
     postUserData(userCredentials);
   };
 
-  const isLogin=useSelector(state=>state.auth.isLogin);
-  const dispatch=useDispatch();
+  const isLogin = useSelector((state) => state.auth.isLogin);
+  const dispatch = useDispatch();
 
   const postUserData = (obj) => {
     let url;
@@ -43,33 +42,35 @@ const SignUp = () => {
     })
       .then((res) => {
         if (!res.ok) {
-          throw new Error("error in posting data");
+          throw new Error("error in signUP? Already a user try login..");
         } else {
           return res.json();
         }
       })
       .then((data) => {
-        localStorage.setItem("1",data.idToken);
         dispatch(Authactions.setToken(data.idToken));
         // splitting email and removing '.com' from it
-        const email=obj.email.split(".com")[0];
+        const email = obj.email.split(".com")[0];
         dispatch(Authactions.setEmailId(email));
-        console.log("added token to store");
-        console.log(data.idToken);
+        console.log("added token,email to store");
+        localStorage.setItem("token", data.idToken);
+        localStorage.setItem("email", email);
+        console.log("added token to localStorage");
+        // console.log(data.idToken);
+        history.replace("/home");
       })
       .catch((err) => {
         alert(err.message);
       });
-    history.replace('/home');
   };
 
-  const forgotHandler=()=>{
+  const forgotHandler = () => {
     history.push("/forgotPassword");
-  }
+  };
 
-  const loginHandler=()=>{
+  const loginHandler = () => {
     dispatch(Authactions.loginHandler());
-  }
+  };
 
   return (
     <>
@@ -91,10 +92,12 @@ const SignUp = () => {
             ""
           )}
           <div className="d-flex">
-          <Button className=" m-auto" type="submit" size="sm">
-            {isLogin ? "Login" : "Sign Up"}
-          </Button>
-          <Button  variant="" className="text-danger" onClick={forgotHandler}>Forgot Password?</Button>
+            <Button className=" m-auto" type="submit" size="sm">
+              {isLogin ? "Login" : "Sign Up"}
+            </Button>
+            <Button variant="" className="text-danger" onClick={forgotHandler}>
+              Forgot Password?
+            </Button>
           </div>
         </form>
         <Button

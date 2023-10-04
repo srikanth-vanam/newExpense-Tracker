@@ -14,8 +14,8 @@ const authSlice = createSlice({
     removeToken(state) {
       state.token = null;
     },
-    setEmailId(state,action){
-      state.emailId=action.payload;
+    setEmailId(state, action) {
+      state.emailId = action.payload;
     },
   },
 });

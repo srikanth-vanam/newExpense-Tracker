@@ -1,17 +1,11 @@
 import { Button, Card, Table } from "react-bootstrap";
-// import { useDispatch } from "react-redux";
-// import { expenseActions } from "../../store/store";
 
 const ExpenseItems = (props) => {
-  // const dispatch=useDispatch();
   const clickHandler=(id)=>{
-    // dispatch(expenseActions.setEditId(id));
     props.onEdit(id);
-    props.onUpdate();
   }
 
   const deleteHandler=(id)=>{
-    // dispatch(expenseActions.setDeleteId(id))
     props.onDelete(id);
   }
 

@@ -15,12 +15,18 @@ const Home = () => {
   const isDark = useSelector((state) => state.theme.isDark);
   const expenseItems = useSelector((state) => state.expense.expenseItems);
   // need to work on losing token,email on page-refresh
-  const email=useSelector(state=>state.auth.emailId);
-  useEffect(()=>{
-    dispatch(Authactions.setToken(token));
-    dispatch(Authactions.setEmailId(email));
-    console.log("in homes useEffect",email);
-  },[])
+
+  useEffect(() => {
+    const storeToken = localStorage.getItem("token");
+    const storedEmail = localStorage.getItem("email");
+    if (storedEmail && storeToken) {
+      dispatch(Authactions.setToken(storeToken));
+      dispatch(Authactions.setEmailId(storedEmail));
+      console.log("in homes useEffect");
+    } else {
+      console.log("in else part of homes useEffect");
+    }
+  }, []);
 
   const themeToggler = () => {
     dispatch(themeActions.themeToggler());
@@ -59,6 +65,8 @@ const Home = () => {
     dispatch(Authactions.removeToken());
     // dispatch(Authactions.setEmailId(null));
     console.log("removed token");
+    localStorage.removeItem("token");
+    localStorage.removeItem("email");
     history.replace("/");
   };
 
